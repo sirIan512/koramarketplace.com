@@ -455,6 +455,7 @@
         
         // ============================================
         // ADMIN FUNCTIONS - PASSWORD: 25122007kora
+        // NO WHATSAPP NOTIFICATIONS - FIXED "LINK COULDN'T BE OPENED" ERROR
         // ============================================
         const ADMIN_PASSWORD = "25122007kora";
         let adminLoggedIn = false;
@@ -491,13 +492,81 @@
             if (slider) slider.addEventListener('input', function() { document.getElementById('commissionPreview').innerHTML = `On UGX 1,000,000 sale: You earn UGX ${(1000000 * this.value / 100).toLocaleString()}`; });
         }
         function saveCommissionSettings() { const newRate = parseFloat(document.getElementById('commissionSlider')?.value) || commissionSettings.rate; const newMinCommission = parseInt(document.getElementById('minCommission')?.value) || 0; commissionSettings.rate = newRate; commissionSettings.minCommission = newMinCommission; localStorage.setItem('kora_commission_settings', JSON.stringify(commissionSettings)); showToast(`Commission updated to ${newRate}%`); renderCommissionSettings(); }
-        function resetCommissionSettings() { commissionSettings = { rate: 5, minCommission: 0 }; localStorage.setItem('kora_commission_settings', JSON.stringify(commissionSettings)); renderCommissionSettings(); showToast('Commission reset to 5'); }
-        function approveProduct(id) { const p = pendingProducts.find(p => p.id === id); if(p) { p.id = products.length + 1; products.unshift(p); pendingProducts = pendingProducts.filter(p => p.id !== id); localStorage.setItem('kora_products', JSON.stringify(products)); localStorage.setItem('kora_pending_products', JSON.stringify(pendingProducts)); showToast('Product approved!'); loadAdminData(); renderProducts(); contactNumber(p.sellerPhone, 'whatsapp'); } }
-        function rejectProduct(id) { pendingProducts = pendingProducts.filter(p => p.id !== id); localStorage.setItem('kora_pending_products', JSON.stringify(pendingProducts)); showToast('Product rejected'); loadAdminData(); }
-        function verifyPayment(id) { const p = payments.find(p => p.id === id); if(p) { p.status = 'verified'; const order = { id: p.id, productId: p.productId, productTitle: p.productTitle, amount: p.amount, sellerName: p.sellerName, sellerPhone: p.sellerPhone, buyerName: p.buyerName, buyerPhone: p.buyerPhone, status: 'confirmed', date: Date.now() }; orders.push(order); localStorage.setItem('kora_orders', JSON.stringify(orders)); payments = payments.filter(p => p.id !== id); localStorage.setItem('kora_payments', JSON.stringify(payments)); showToast('Payment verified! Order confirmed.'); loadAdminData(); contactNumber(p.sellerPhone, 'whatsapp'); contactNumber(p.buyerPhone, 'whatsapp'); } }
-        function rejectPayment(id) { payments = payments.filter(p => p.id !== id); localStorage.setItem('kora_payments', JSON.stringify(payments)); showToast('Payment rejected'); loadAdminData(); }
-        function approveSeller(id) { const s = pendingSellers.find(s => s.id === id); if(s) { sellers.push(s); pendingSellers = pendingSellers.filter(s => s.id !== id); localStorage.setItem('kora_sellers', JSON.stringify(sellers)); localStorage.setItem('kora_pending_sellers', JSON.stringify(pendingSellers)); showToast('Seller verified!'); loadAdminData(); contactNumber(s.phone, 'whatsapp'); } }
-        function rejectSeller(id) { pendingSellers = pendingSellers.filter(s => s.id !== id); localStorage.setItem('kora_pending_sellers', JSON.stringify(pendingSellers)); showToast('Seller rejected'); loadAdminData(); }
+        function resetCommissionSettings() { commissionSettings = { rate: 5, minCommission: 0 }; localStorage.setItem('kora_commission_settings', JSON.stringify(commissionSettings)); renderCommissionSettings(); showToast('Commission reset to 5%'); }
+        
+        // FIXED: No WhatsApp notifications - no more "link couldn't be opened" error
+        function approveProduct(id) {
+            const p = pendingProducts.find(p => p.id === id);
+            if(p) {
+                p.id = products.length + 1;
+                products.unshift(p);
+                pendingProducts = pendingProducts.filter(p => p.id !== id);
+                localStorage.setItem('kora_products', JSON.stringify(products));
+                localStorage.setItem('kora_pending_products', JSON.stringify(pendingProducts));
+                showToast('✅ Product approved!');
+                loadAdminData();
+                renderProducts();
+            }
+        }
+        
+        function rejectProduct(id) {
+            pendingProducts = pendingProducts.filter(p => p.id !== id);
+            localStorage.setItem('kora_pending_products', JSON.stringify(pendingProducts));
+            showToast('❌ Product rejected');
+            loadAdminData();
+        }
+        
+        function verifyPayment(id) {
+            const p = payments.find(p => p.id === id);
+            if(p) {
+                p.status = 'verified';
+                const order = {
+                    id: p.id,
+                    productId: p.productId,
+                    productTitle: p.productTitle,
+                    amount: p.amount,
+                    sellerName: p.sellerName,
+                    sellerPhone: p.sellerPhone,
+                    buyerName: p.buyerName,
+                    buyerPhone: p.buyerPhone,
+                    status: 'confirmed',
+                    date: Date.now()
+                };
+                orders.push(order);
+                localStorage.setItem('kora_orders', JSON.stringify(orders));
+                payments = payments.filter(p => p.id !== id);
+                localStorage.setItem('kora_payments', JSON.stringify(payments));
+                showToast('✅ Payment verified! Order confirmed.');
+                loadAdminData();
+            }
+        }
+        
+        function rejectPayment(id) {
+            payments = payments.filter(p => p.id !== id);
+            localStorage.setItem('kora_payments', JSON.stringify(payments));
+            showToast('❌ Payment rejected');
+            loadAdminData();
+        }
+        
+        function approveSeller(id) {
+            const s = pendingSellers.find(s => s.id === id);
+            if(s) {
+                sellers.push(s);
+                pendingSellers = pendingSellers.filter(s => s.id !== id);
+                localStorage.setItem('kora_sellers', JSON.stringify(sellers));
+                localStorage.setItem('kora_pending_sellers', JSON.stringify(pendingSellers));
+                showToast('✅ Seller verified!');
+                loadAdminData();
+            }
+        }
+        
+        function rejectSeller(id) {
+            pendingSellers = pendingSellers.filter(s => s.id !== id);
+            localStorage.setItem('kora_pending_sellers', JSON.stringify(pendingSellers));
+            showToast('❌ Seller rejected');
+            loadAdminData();
+        }
+        
         function loadAdminFraudAlerts() { const container = document.getElementById('fraudAlerts'); if(container) container.innerHTML = '<p>No active fraud alerts.</p>'; }
         
         function showTab(tabName) {
