@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>KORA Marketplace - Uganda's #1 Trusted Marketplace</title>
-    <meta name="description" content="KORA Marketplace - Uganda's largest trusted marketplace. Buy and sell phones, electronics, vehicles, land, property, furniture, clothes and more. Safe transactions with escrow protection.">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230066FF'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-weight='bold'%3EK%3C/text%3E%3C/svg%3E">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -151,7 +150,7 @@
             <div class="products-grid" id="productsGrid"></div>
         </div>
 
-        <!-- Sell Tab with Image Compression -->
+        <!-- Sell Tab -->
         <div id="sellTab" class="tab-content">
             <div class="modal-content" style="margin:0 auto">
                 <h2>📝 List Your Item</h2>
@@ -186,6 +185,7 @@
     <div id="accountModal" class="modal"><div class="modal-content"><h2>🔐 Account</h2><form id="accountForm"><div class="form-group"><label>Phone</label><input type="tel" id="accountPhone" required></div><div class="form-group"><label>Password</label><input type="password" id="accountPassword" required></div><div class="form-group" id="nameGroup" style="display:none"><label>Full Name</label><input type="text" id="accountName"></div><button type="submit" class="btn-primary" id="accountSubmitBtn">Login</button><button type="button" class="btn-outline" id="accountToggleBtn" onclick="toggleAccountMode()">Create Account</button><button type="button" class="btn-outline" onclick="closeAccountModal()">Cancel</button></form><div id="accountInfo" style="display:none"><p>Logged in as: <strong id="userNameDisplay"></strong></p><button onclick="logout()" class="btn-warning">Logout</button></div></div></div>
     <div id="sellerModal" class="modal"><div class="modal-content"><h2>✅ Become a Verified Seller</h2><form id="sellerForm"><div class="form-group"><label>Full Name</label><input type="text" id="verifyName" required></div><div class="form-group"><label>Phone</label><input type="tel" id="verifyPhone" required></div><div class="form-group"><label>NIN Number</label><input type="text" id="verifyNin" required></div><div class="form-group"><label>Location</label><input type="text" id="verifyLocation"></div><button type="submit" class="btn-primary">Submit</button><button type="button" class="btn-outline" onclick="closeSellerModal()">Cancel</button></form></div></div>
 
+    <!-- ADMIN PANEL - PASSWORD: 25122007kora -->
     <div id="adminModal" class="modal"><div class="modal-content" style="max-width:800px"><div style="display:flex;justify-content:space-between"><h2>🔐 KORA Admin Dashboard</h2><button onclick="closeAdminPanel()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">✕</button></div><div id="adminLogin"><div class="form-group"><label>Admin Password</label><input type="password" id="adminPassword"><p style="font-size:0.7rem;color:var(--warning);">⚠️ Authorized personnel only. This area is restricted.</p></div><button onclick="adminLogin()" class="btn-primary">Login</button></div><div id="adminContent" style="display:none"><div class="tabs"><button class="tab" onclick="showAdminSection('pending')">📋 Pending</button><button class="tab" onclick="showAdminSection('payments')">💰 Payments</button><button class="tab" onclick="showAdminSection('sellers')">👥 Sellers</button><button class="tab" onclick="showAdminSection('commission')">⚙️ Commission</button><button class="tab" onclick="showAdminSection('fraud')">🚨 Fraud Alerts</button></div><div id="adminPendingSection"><div id="pendingListings"></div></div><div id="adminPaymentsSection" style="display:none"><div id="pendingPayments"></div></div><div id="adminSellersSection" style="display:none"><div id="pendingSellers"></div></div><div id="adminCommissionSection" style="display:none"><div id="commissionSettings"></div></div><div id="adminFraudSection" style="display:none"><div id="fraudAlerts"></div></div></div></div></div>
     <div id="productModal" class="modal"><div class="modal-content" id="productModalContent"></div></div>
 
@@ -216,7 +216,6 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    // Compress to JPEG quality 0.7 (good balance size/quality)
                     const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
                     callback(compressedDataUrl);
                 };
@@ -225,7 +224,6 @@
             reader.readAsDataURL(file);
         }
 
-        // Preview with compression
         function previewImage(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -233,16 +231,12 @@
                     const preview = document.getElementById('imagePreview');
                     preview.src = compressedDataUrl;
                     preview.style.display = 'block';
-                    // Store compressed data for form submission
                     window.compressedImageData = compressedDataUrl;
                     showToast('Image compressed & ready! ✅');
                 });
             }
         }
 
-        // ============================================
-        // CONTACT FUNCTIONS
-        // ============================================
         function contactNumber(number, type) {
             let cleanNumber = number.replace(/[\s\-]/g, '');
             if (type === 'whatsapp') {
@@ -260,21 +254,12 @@
         
         if (localStorage.getItem('kora_dark_mode') === 'true') document.body.classList.add('dark-mode');
         
-        // ============================================
-        // FRAUD DETECTION (simplified placeholder)
-        // ============================================
         let fraudAlerts = JSON.parse(localStorage.getItem('kora_fraud_alerts') || '[]');
         function detectFraud(listing) { return { score: 0, reasons: [], isSuspicious: false }; }
         
-        // ============================================
-        // COMMISSION SETTINGS
-        // ============================================
         let commissionSettings = JSON.parse(localStorage.getItem('kora_commission_settings') || '{"rate":5, "minCommission":0}');
         function getCommissionRate() { return commissionSettings.rate; }
         
-        // ============================================
-        // DATA STORAGE
-        // ============================================
         let products = JSON.parse(localStorage.getItem('kora_products') || '[]');
         let pendingProducts = JSON.parse(localStorage.getItem('kora_pending_products') || '[]');
         let sellers = JSON.parse(localStorage.getItem('kora_sellers') || '[]');
@@ -297,9 +282,6 @@
         
         function showToast(msg) { let t = document.createElement('div'); t.className = 'toast'; t.innerHTML = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
         
-        // ============================================
-        // USER ACCOUNT
-        // ============================================
         let isLoginMode = true;
         function showAccountModal() {
             document.getElementById('accountModal').classList.add('active');
@@ -337,9 +319,6 @@
         
         function logout() { currentUser = null; localStorage.removeItem('kora_current_user'); showToast('Logged out'); closeAccountModal(); renderProducts(); }
         
-        // ============================================
-        // PRODUCT & DISPLAY FUNCTIONS
-        // ============================================
         function getCategoryIcon(cat) {
             const icons = { phones:"📱", laptops:"💻", electronics:"📺", vehicles:"🚗", land:"🏞️", property:"🏘️", furniture:"🛋️", clothes:"👕", beauty:"💄", baby:"👶", sports:"⚽", books:"📚", services:"💼" };
             return icons[cat] || "📦";
@@ -428,9 +407,7 @@
             });
         }
         
-        // ============================================
         // LISTING FORM SUBMIT (WITH COMPRESSED IMAGE)
-        // ============================================
         document.getElementById('listingForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
             const compressedData = window.compressedImageData;
@@ -448,15 +425,13 @@
                 sellerName: document.getElementById('sellerName').value,
                 sellerPhone: document.getElementById('sellerPhone').value,
                 sellerLocation: document.getElementById('sellerLocation').value,
-                imageData: compressedData,  // compressed image
+                imageData: compressedData,
                 rating: 0,
                 views: 0,
                 isFeatured: false,
                 dateAdded: Date.now(),
                 status: 'pending'
             };
-            
-            // Optional: fraud detection can be added here
             pendingProducts.push(newProduct);
             localStorage.setItem('kora_pending_products', JSON.stringify(pendingProducts));
             showToast('✅ Product submitted for admin approval!');
@@ -479,7 +454,7 @@
         });
         
         // ============================================
-        // ADMIN FUNCTIONS (Password: 25122007kora)
+        // ADMIN FUNCTIONS - PASSWORD: 25122007kora
         // ============================================
         const ADMIN_PASSWORD = "25122007kora";
         let adminLoggedIn = false;
@@ -516,7 +491,7 @@
             if (slider) slider.addEventListener('input', function() { document.getElementById('commissionPreview').innerHTML = `On UGX 1,000,000 sale: You earn UGX ${(1000000 * this.value / 100).toLocaleString()}`; });
         }
         function saveCommissionSettings() { const newRate = parseFloat(document.getElementById('commissionSlider')?.value) || commissionSettings.rate; const newMinCommission = parseInt(document.getElementById('minCommission')?.value) || 0; commissionSettings.rate = newRate; commissionSettings.minCommission = newMinCommission; localStorage.setItem('kora_commission_settings', JSON.stringify(commissionSettings)); showToast(`Commission updated to ${newRate}%`); renderCommissionSettings(); }
-        function resetCommissionSettings() { commissionSettings = { rate: 5, minCommission: 0 }; localStorage.setItem('kora_commission_settings', JSON.stringify(commissionSettings)); renderCommissionSettings(); showToast('Commission reset to 5%'); }
+        function resetCommissionSettings() { commissionSettings = { rate: 5, minCommission: 0 }; localStorage.setItem('kora_commission_settings', JSON.stringify(commissionSettings)); renderCommissionSettings(); showToast('Commission reset to 5'); }
         function approveProduct(id) { const p = pendingProducts.find(p => p.id === id); if(p) { p.id = products.length + 1; products.unshift(p); pendingProducts = pendingProducts.filter(p => p.id !== id); localStorage.setItem('kora_products', JSON.stringify(products)); localStorage.setItem('kora_pending_products', JSON.stringify(pendingProducts)); showToast('Product approved!'); loadAdminData(); renderProducts(); contactNumber(p.sellerPhone, 'whatsapp'); } }
         function rejectProduct(id) { pendingProducts = pendingProducts.filter(p => p.id !== id); localStorage.setItem('kora_pending_products', JSON.stringify(pendingProducts)); showToast('Product rejected'); loadAdminData(); }
         function verifyPayment(id) { const p = payments.find(p => p.id === id); if(p) { p.status = 'verified'; const order = { id: p.id, productId: p.productId, productTitle: p.productTitle, amount: p.amount, sellerName: p.sellerName, sellerPhone: p.sellerPhone, buyerName: p.buyerName, buyerPhone: p.buyerPhone, status: 'confirmed', date: Date.now() }; orders.push(order); localStorage.setItem('kora_orders', JSON.stringify(orders)); payments = payments.filter(p => p.id !== id); localStorage.setItem('kora_payments', JSON.stringify(payments)); showToast('Payment verified! Order confirmed.'); loadAdminData(); contactNumber(p.sellerPhone, 'whatsapp'); contactNumber(p.buyerPhone, 'whatsapp'); } }
